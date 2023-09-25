@@ -8,9 +8,6 @@ pub struct Ship {
     pub shields: u8,
     pub hull: u8,
     pub yellow_dice: u8,
-    pub orange_dice: u8,
-    pub blue_dice: u8,
-    pub red_dice: u8,
 }
 
 #[allow(dead_code)]
@@ -22,9 +19,6 @@ impl Ship {
         shields: u8,
         hull: u8,
         yellow_dice: u8,
-        orange_dice: u8,
-        blue_dice: u8,
-        red_dice: u8,
     ) -> Ship {
         Ship {
             name,
@@ -33,26 +27,19 @@ impl Ship {
             shields,
             hull,
             yellow_dice,
-            orange_dice,
-            blue_dice,
-            red_dice,
         }
     }
 
-    pub fn interceptor() -> Ship {
-        Self::new("interceptor".to_owned(), 2, 0, 0, 0, 1, 0, 0, 0)
-    }
-
-    pub fn cruiser() -> Ship {
-        Self::new("cruiser".to_owned(), 1, 1, 0, 1, 1, 0, 0, 0)
-    }
+    // pub fn cruiser() -> Ship {
+    //     Self::new("cruiser", 2, 1, 0, 1, 1)
+    // }
 
     pub fn dreadnaught() -> Ship {
-        Self::new("dreadnaught".to_owned(), 1, 1, 0, 2, 2, 0, 0, 0)
+        Self::new("dreadnaught".to_owned(), 1, 1, 0, 2, 2)
     }
 
     pub fn base_ancient() -> Ship {
-        Self::new("base_ancient".to_owned(), 2, 1, 0, 1, 2, 0, 0, 0)
+        Self::new("base_ancient".to_owned(), 2, 1, 0, 1, 2)
     }
 
     pub fn roll_against(self: &Ship, opp_ship: &Ship) -> u8 {
@@ -60,17 +47,13 @@ impl Ship {
         let mut damage = 0;
         for _n in 0..self.yellow_dice {
             let v = rng.gen_range(1..=6);
-            // print!("{} ", v);
             if v == 6 {
                 damage += 1;
-                // print!("HIT!");
             } else if v > 1 {
                 if v + self.computers - opp_ship.shields >= 6 {
                     damage += 1;
-                    // print!("HIT!");
                 }
             }
-            // println!();
         }
         damage
     }

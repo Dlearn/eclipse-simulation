@@ -4,7 +4,7 @@ use crate::{ship::Ship, PRINT_LOGS};
 
 #[derive(Default)]
 pub struct Battle {
-    // 1 is targetted before 2, etc.
+    // 1 is targeted before 2, etc.
     pub att_type1: Ship,
     pub att_type1_count: u8,
     pub att_type1_acc_dmg: u8, // damage is accumulated until a ship is destroyed
