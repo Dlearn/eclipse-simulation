@@ -1,6 +1,6 @@
 use rand::prelude::*;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Ship {
     pub name: String,
     pub initiative: u8,
@@ -53,25 +53,5 @@ impl Ship {
 
     pub fn base_ancient() -> Ship {
         Self::new("base_ancient".to_owned(), 2, 1, 0, 1, 2, 0, 0, 0)
-    }
-
-    pub fn roll_against(self: &Ship, opp_ship: &Ship) -> u8 {
-        let mut rng = rand::thread_rng();
-        let mut damage = 0;
-        for _n in 0..self.yellow_dice {
-            let v = rng.gen_range(1..=6);
-            // print!("{} ", v);
-            if v == 6 {
-                damage += 1;
-                // print!("HIT!");
-            } else if v > 1 {
-                if v + self.computers - opp_ship.shields >= 6 {
-                    damage += 1;
-                    // print!("HIT!");
-                }
-            }
-            // println!();
-        }
-        damage
     }
 }

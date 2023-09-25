@@ -1,61 +1,57 @@
+mod ship_type_def;
+
+use ship_type_def::ShipType;
+
 use std::cmp;
 
 use crate::{ship::Ship, PRINT_LOGS};
 
 #[derive(Default)]
 pub struct Battle {
-    // 1 is targetted before 2, etc.
-    pub att_type1: Ship,
-    pub att_type1_count: u8,
-    pub att_type1_acc_dmg: u8, // damage is accumulated until a ship is destroyed
-    pub att_type2: Ship,
-    pub att_type2_count: u8,
-    pub att_type2_acc_dmg: u8, // damage is accumulated until a ship is destroyed
-    pub def_type1: Ship,
-    pub def_type1_count: u8,
-    pub def_type1_acc_dmg: u8, // damage is accumulated until a ship is destroyed
+    pub att_ships: Vec<ShipType>,
+    pub def_ships: Vec<ShipType>,
     pub att_won: bool,
 }
 
 impl Battle {
-    pub fn new(
-        att_type1: Ship,
-        att_type1_count: u8,
-        def_type1: Ship,
-        def_type1_count: u8,
-    ) -> Battle {
+    pub fn new(att_ships: Vec<ShipType>, def_ships: Vec<ShipType>) -> Battle {
         Battle {
-            att_type1,
-            att_type1_count,
-            def_type1,
-            def_type1_count,
+            att_ships,
+            def_ships,
             ..Default::default()
         }
     }
 
     pub fn resolve(&mut self) {
-        while self.att_type1_count > 0 && self.def_type1_count > 0 {
-            if self.def_type1.initiative >= self.att_type1.initiative {
-                self.def_shoot_att();
-                self.att_shoot_def();
-            } else {
-                self.att_shoot_def();
-                self.def_shoot_att();
-            }
+        // While attackers and defenders have forces
+        while self.att_ships.into_iter().any(|ship| ship.count > 0)
+            && self.def_ships.into_iter().any(|ship| ship.count > 0)
+        {
+            let mut all_ships = self.att_ships.clone();
+            all_ships.append(&mut self.def_ships.clone());
+            all_ships.sort_by(|a, b| a.ship_type.initiative.cmp(&b.ship_type.initiative))
         }
-        if self.att_type1_count == 0 {
-            if *PRINT_LOGS {
-                println!("Defender {} wins", self.def_type1.name);
-                println!("================================================")
-            }
-            self.att_won = false;
-        } else {
-            if *PRINT_LOGS {
-                println!("Attacker {} wins", self.att_type1.name);
-                println!("================================================")
-            }
-            self.att_won = true;
-        }
+        //     if self.def_type1.initiative >= self.att_type1.initiative {
+        //         self.def_shoot_att();
+        //         self.att_shoot_def();
+        //     } else {
+        //         self.att_shoot_def();
+        //         self.def_shoot_att();
+        //     }
+        // }
+        // if self.att_type1_count == 0 {
+        //     if *PRINT_LOGS {
+        //         println!("Defender {} wins", self.def_type1.name);
+        //         println!("================================================")
+        //     }
+        //     self.att_won = false;
+        // } else {
+        //     if *PRINT_LOGS {
+        //         println!("Attacker {} wins", self.att_type1.name);
+        //         println!("================================================")
+        //     }
+        //     self.att_won = true;
+        // }
     }
 
     fn att_shoot_def(&mut self) {
@@ -99,6 +95,51 @@ impl Battle {
                 self.att_type1_count,
                 self.att_type1_acc_dmg
             );
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct BattleBuilder {
+    att_type1: Ship,
+    att_type1_count: u8,
+    def_type1: Ship,
+    def_type1_count: u8,
+    att_type2: Ship,
+    att_type2_count: u8,
+}
+
+impl BattleBuilder {
+    pub fn new(
+        att_type1: Ship,
+        att_type1_count: u8,
+        def_type1: Ship,
+        def_type1_count: u8,
+    ) -> BattleBuilder {
+        BattleBuilder {
+            att_type1,
+            att_type1_count,
+            def_type1,
+            def_type1_count,
+            ..Default::default()
+        }
+    }
+
+    pub fn set_att_type2(mut self, att_type2: Ship, att_type2_count: u8) -> BattleBuilder {
+        self.att_type2 = att_type2;
+        self.att_type2_count = att_type2_count;
+        self
+    }
+
+    pub fn build(self) -> Battle {
+        Battle {
+            att_type1: self.att_type1,
+            att_type1_count: self.att_type1_count,
+            def_type1: self.def_type1,
+            def_type1_count: self.def_type1_count,
+            att_type2: self.att_type2,
+            att_type2_count: self.att_type2_count,
+            ..Default::default()
         }
     }
 }
